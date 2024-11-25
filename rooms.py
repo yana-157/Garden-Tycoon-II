@@ -11,7 +11,7 @@ class Store:
 class Room:
 	def __init__(self, name):
 		self.name = name
-		self.objectActions = {}
+		self.objectActions = dict{}
 	def addObject(self, obj, action=None, requiredLevel=0):
 		self.objectActions[obj] = (action, requiredLevel)
 
