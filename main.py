@@ -46,8 +46,8 @@ def draw(app):
 def redrawAll(app):
     drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
     currentRoom = app.store.currentRoom
-    for obj in currentRoom.objects:
-        draw(obj)
+    for obj in app.store.rooms[currentRoom].roomItems:
+        obj.draw()
 
 def onMousePress(app, mouseX, mouseY):
     currentRoom = app.store.currentRoom
