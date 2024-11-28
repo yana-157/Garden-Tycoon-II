@@ -26,11 +26,13 @@ def onAppStart(app):
     app.store.addRoom(seedShelf)
     app.store.currentRoom = 'lobby'
 
-def draw(app):
+def redrawAll(app):
+    print(app.store.currentRoom)
+    drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
     if app.store.currentRoom == 'lobby':
         drawRect(0, 350, 100, 250, fill='pink')
-        drawLabel('Nursery', 50, 475, size=20, action=app.store.switchRoom('nursery'), requiredLevel=0)
-        drawRect(700, 350, 100, 250, fill='pink', action=app.store.switchRoom('potting'), requiredLevel=0)
+        drawLabel('Nursery', 50, 475, size=20)
+        drawRect(700, 350, 100, 250, fill='pink')
         drawLabel('Fill orders', 750, 475, size=18)
     elif app.store.currentRoom == 'nursery':
         drawLabel('Nursery Placeholder', 400, 300, size=20)
@@ -42,16 +44,12 @@ def draw(app):
         drawLabel('Seed Shelf Placeholder', 400, 300, size=20) 
     else:
         app.store.currentRoom = lobby
-
-def redrawAll(app):
-    drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
-    currentRoom = app.store.currentRoom
     for obj in app.store.rooms[currentRoom].roomItems:
         obj.draw()
 
 def onMousePress(app, mouseX, mouseY):
     currentRoom = app.store.currentRoom
-    for obj in currentRoom.objects:
+    for obj in app.store.rooms[currentRoom].roomItems:
         if obj.x <= mouseX <= obj.x + obj.width and obj.y <= mouseY <= obj.y + obj.height:
             if isIn(mouseX, mouseY, object):
                 action, requiredLevel = objectActions[obj]

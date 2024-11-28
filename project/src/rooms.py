@@ -1,19 +1,28 @@
+from cmu_graphics import *
 class Store:
-	def __init__(self):
-		self.rooms = dict()
-		self.currentRoom = None
-	def addRoom(self, room):
-		self.rooms[room.name] = room
-	def switchRoom(self, roomName):
-		if roomName in self.rooms:
-			self.currentRoom = roomName
+    def __init__(self, playerLevel, balance):
+        self.playerLevel = 0
+        self.balance = 0
+    def earn(self, payment):
+        self.balance += payment
+
+        
 
 class Room:
 	def __init__(self, name):
+        self.name = name
+        self.currentRoom = None
+	def addRoom(self, room):
+		self.rooms[room.name] = room
+	def switchRoom(self, name):
+		if roomName in self.rooms:
+			self.currentRoom = roomName
+
+class Objects:
+	def __init__(self, name):
 		self.name = name
-		self.objectActions = dict{}
 	def addObject(self, obj, action=None, requiredLevel=0):
-		self.objectActions[obj] = (action, requiredLevel)
+		self.roomItems[obj] = (action, requiredLevel)
 
 class Shape:
     def __init__(self, x, y, width, height, fill=None, shapeType='rectangle', action=None, requiredLevel=0):
