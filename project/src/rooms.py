@@ -1,19 +1,18 @@
 from cmu_graphics import *
 class Store:
-    def __init__(self, playerLevel, balance):
+    def __init__(self, playerLevel, balance, currentRoom):
         self.playerLevel = 0
         self.balance = 0
+        self.currentRoom = 'lobby'
     def earn(self, payment):
         self.balance += payment
-
-        
+    def levelUp(self):
+        self.playerLevel += 1
 
 class Room:
 	def __init__(self, name):
         self.name = name
         self.currentRoom = None
-	def addRoom(self, room):
-		self.rooms[room.name] = room
 	def switchRoom(self, name):
 		if roomName in self.rooms:
 			self.currentRoom = roomName

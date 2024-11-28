@@ -9,6 +9,7 @@ def onAppStart(app):
     app.playerLevel = 0
     app.backgroundPic = 'assets/shopPlaceholder.jpeg'
     app.store = Store()
+    app.room = Room()
     lobby = Room('lobby')
     nursery = Room('nursery')
     potting = Room('potting')
@@ -18,12 +19,12 @@ def onAppStart(app):
     pottingDoor = Shape(700, 350, 100, 250, fill='pink')
     lobby.addObject(nurseryDoor, action=lambda: app.store.switchRoom('nursery'), requiredLevel=0)
     lobby.addObject(pottingDoor, action=lambda: app.store.switchRoom('potting'), requiredLevel=0)
-    app.store.switchRoom('lobby')
-    app.store.addRoom(lobby)
-    app.store.addRoom(nursery)
-    app.store.addRoom(potting)
-    app.store.addRoom(seeding)
-    app.store.addRoom(seedShelf)
+    app.room.switchRoom('lobby')
+    app.room.addRoom(lobby)
+    app.room.addRoom(nursery)
+    app.room.addRoom(potting)
+    app.room.addRoom(seeding)
+    app.room.addRoom(seedShelf)
     app.store.currentRoom = 'lobby'
 
 def redrawAll(app):
