@@ -17,20 +17,14 @@ def onAppStart(app):
     seedShelf = Room('seedShelf')
     nurseryDoor = Shape(0, 350, 100, 250, fill='pink')
     pottingDoor = Shape(700, 350, 100, 250, fill='pink')
-    lobby.addObject(nurseryDoor, action=lambda: app.store.switchRoom('nursery'), requiredLevel=0)
-    lobby.addObject(pottingDoor, action=lambda: app.store.switchRoom('potting'), requiredLevel=0)
-    app.room.switchRoom('lobby')
-    app.room.addRoom(lobby)
-    app.room.addRoom(nursery)
-    app.room.addRoom(potting)
-    app.room.addRoom(seeding)
-    app.room.addRoom(seedShelf)
-    app.store.currentRoom = 'lobby'
+    lobby.addObject(nurseryDoor, action=lambda: store.switchRoom(nursery), requiredLevel=0)
+    lobby.addObject(pottingDoor, action=lambda: store.switchRoom(potting), requiredLevel=0)
+    store.currentRoom = 'lobby'
 
 def redrawAll(app):
     print(app.store.currentRoom)
     drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
-    if app.store.currentRoom == 'lobby':
+    if store.currentRoom == 'lobby':
         drawRect(0, 350, 100, 250, fill='pink')
         drawLabel('Nursery', 50, 475, size=20)
         drawRect(700, 350, 100, 250, fill='pink')
