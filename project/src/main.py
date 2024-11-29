@@ -8,8 +8,7 @@ def onAppStart(app):
     app.height = 600
     app.playerLevel = 0
     app.backgroundPic = 'assets/shopPlaceholder.jpeg'
-    app.store = Store()
-    app.room = Room()
+    app.store = Store(playerLevel=0, balance=0, currentRoom=lobby)
     lobby = Room('lobby')
     nursery = Room('nursery')
     potting = Room('potting')
@@ -17,14 +16,13 @@ def onAppStart(app):
     seedShelf = Room('seedShelf')
     nurseryDoor = Shape(0, 350, 100, 250, fill='pink')
     pottingDoor = Shape(700, 350, 100, 250, fill='pink')
-    lobby.addObject(nurseryDoor, action=lambda: store.switchRoom(nursery), requiredLevel=0)
-    lobby.addObject(pottingDoor, action=lambda: store.switchRoom(potting), requiredLevel=0)
-    store.currentRoom = 'lobby'
+    # lobby.addObject(nurseryDoor, action=lambda: store.switchRoom(nursery), requiredLevel=0)
+    # lobby.addObject(pottingDoor, action=lambda: store.switchRoom(potting), requiredLevel=0)
 
 def redrawAll(app):
     print(app.store.currentRoom)
     drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
-    if store.currentRoom == 'lobby':
+    if app.store.currentRoom == 'lobby':
         drawRect(0, 350, 100, 250, fill='pink')
         drawLabel('Nursery', 50, 475, size=20)
         drawRect(700, 350, 100, 250, fill='pink')
@@ -43,13 +41,11 @@ def redrawAll(app):
         obj.draw()
 
 def onMousePress(app, mouseX, mouseY):
-    currentRoom = app.store.currentRoom
-    for obj in app.store.rooms[currentRoom].roomItems:
+    for obj in app.store.currentRoom.roomItems:
         if obj.x <= mouseX <= obj.x + obj.width and obj.y <= mouseY <= obj.y + obj.height:
             if isIn(mouseX, mouseY, object):
-                action, requiredLevel = objectActions[obj]
-                if playerLevel >= requiredLevel:
-                    action
+                if app.playerLevel >= requiredLevel:
+                    obj.action
                 else:
                     print ('f{action} is locked. Reach {requiredLevel} to unlock!')
 

@@ -10,18 +10,18 @@ class Store:
         self.playerLevel += 1
 
 class Room:
-	def __init__(self, name):
+    def __init__(self, name):
         self.name = name
         self.currentRoom = None
-	def switchRoom(self, name):
-		if roomName in self.rooms:
-			self.currentRoom = roomName
+    def switchRoom(self, name):
+        if roomName in self.rooms:
+            self.currentRoom = roomName
 
 class Objects:
-	def __init__(self, name):
-		self.name = name
-	def addObject(self, obj, action=None, requiredLevel=0):
-		self.roomItems[obj] = (action, requiredLevel)
+    def __init__(self, name, action, requiredLevel):
+        self.name = name
+        self.action = None
+        self.requiredLevel = 0
 
 class Shape:
     def __init__(self, x, y, width, height, fill=None, shapeType='rectangle', action=None, requiredLevel=0):
@@ -50,14 +50,14 @@ class Shape:
                 fill=self.fill
             )
 class Sprite:
-	def __init__(self, x, y, width, height, imagePath, action=None, requiredLevel=0):
-		self.x = x
-		self.y = y
-		self.width = width
-		self.height = height
-		self.imagePath = imagePath
-		self.action = action
-		self.requiredLevel = requiredLevel
-		self.image = None
-	def draw(self):
-		drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
+    def __init__(self, x, y, width, height, imagePath):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.imagePath = imagePath
+        self.action = action
+        self.requiredLevel = requiredLevel
+        self.image = None
+    def draw(self):
+        drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
