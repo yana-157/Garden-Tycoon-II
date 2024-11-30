@@ -1,40 +1,38 @@
 from cmu_graphics import *
+
 class Store:
-    def __init__(self, playerLevel, balance, currentRoom):
+    def __init__(self, playerLevel, balance):
         self.playerLevel = 0
         self.balance = 0
-        self.currentRoom = 'lobby'
+        self.currentRoom = lobby
     def earn(self, payment):
         self.balance += payment
     def levelUp(self):
         self.playerLevel += 1
+    def switchRoom(self, name):
+        if name in self.Room:
+            self.currentRoom = name
 
 class Room:
     def __init__(self, name):
         self.name = name
-        self.currentRoom = None
-    def switchRoom(self, name):
-        if roomName in self.rooms:
-            self.currentRoom = roomName
 
 class Objects:
-    def __init__(self, name, action, requiredLevel):
+    def __init__(self, name, action=None, requiredLevel=0):
         self.name = name
-        self.action = None
-        self.requiredLevel = 0
+        self.action = action
+        self.requiredLevel = requiredLevel
 
 class Shape:
-    def __init__(self, x, y, width, height, fill=None, shapeType='rectangle', action=None, requiredLevel=0):
+    def __init__(self, x, y, width, height, fill=None, shapeType='rectangle'):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.fill = fill
         self.shapeType = shapeType
-        self.action = action
-        self.requiredLevel = requiredLevel
     def draw(self):
-        if self.shapeType == "rectangle":
+        if self.shapeType == 'rectangle':
             drawRect(
                 self.x,
                 self.y,
@@ -50,7 +48,7 @@ class Shape:
                 fill=self.fill
             )
 class Sprite:
-    def __init__(self, x, y, width, height, imagePath):
+    def __init__(self, x, y, width, height, imagePath, action, requiredLevel, imagePath):
         self.x = x
         self.y = y
         self.width = width
@@ -58,6 +56,6 @@ class Sprite:
         self.imagePath = imagePath
         self.action = action
         self.requiredLevel = requiredLevel
-        self.image = None
+        self.imagePath = imagePath
     def draw(self):
         drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)

@@ -19,8 +19,8 @@ map_data = [
 [1, 1, 1, 1, 1]
 ]               #the data for the map expressed as [row[tile]].
  
-wall = pygame.image.load('wall.png').convert_alpha()  #load images
-grass = pygame.image.load('grass.png').convert_alpha()
+wall = pygame.image.load('pygame experimentation/wall and grass/wall.png').convert_alpha()  #load images
+grass = pygame.image.load('pygame experimentation/wall and grass/grass.png').convert_alpha()
  
 TILEWIDTH = 64  #holds the tile width and height
 TILEHEIGHT = 64
