@@ -1,4 +1,5 @@
 from cmu_graphics import *
+from imageProcessing import getMask
 
 class Store:
     def __init__(self, currentRoom, XP=0, playerLevel=0, balance=0):
@@ -24,11 +25,12 @@ class Room:
 #         self.requiredLevel = requiredLevel
 
 class Shape:
-    def __init__(self, x, y, width, height, fill=None, shapeType='rectangle'):
+    def __init__(self, x, y, width, height, action, fill=None, shapeType='rectangle'):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.action = action
         self.fill = fill
         self.shapeType = shapeType
     def draw(self):
@@ -57,4 +59,4 @@ class Sprite:
         self.action = action
         self.requiredLevel = requiredLevel
     def draw(self):
-        drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
+        drawImage(getMask(self.imagePath), self.x, self.y, width=self.width, height=self.height)

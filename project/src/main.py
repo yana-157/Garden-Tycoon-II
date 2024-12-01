@@ -10,6 +10,8 @@ roomSet = {lobby, nursery, order, seedShelf}
 
 store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 
+plantInventory = dict()
+
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
             store.currentRoom = targetRoom
@@ -20,9 +22,44 @@ def goToNursery():
 def goToPotting():
     switchRoom(order)
 
-nurseryDoor = Shape(0, 350, 100, 250, fill='pink', shapeType='rectangle')
-orderDoor = Shape(700, 350, 100, 250, fill='pink', shapeType='rectangle')
-lobbyItemDict = {nurseryDoor: (0, goToNursery), orderDoor: (0, goToPotting)}
+def hasCornerIn(obj, other):
+    if (obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y <= obj.y + obj.height
+        or obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y <= obj.y + obj.height
+        or obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height
+        or obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height
+        ):
+        return True
+    else:
+        return False
+
+def overlaps(obj, other):
+    if isinstance(obj, Shape) and isinstance(other, Shape):
+        if hasCornerIn(obj, other)
+            return True
+        else:
+            return False
+       
+    if isinstance(obj, Sprite) and isinstance(other, Shape):
+        if hasCornerIn(obj, other)
+                objPath, threshold = spriteDict[obj]
+                for pixel in getMask(objPath, threshold):
+                    if pixel == 1
+        else:
+            return False
+    
+    if isinstance(obj, Shape) and isinstance(other, Sprite):
+       if hasCornerIn(obj, other)
+    if isinstance(obj, Sprite) and isinstance(other, Sprite):
+        
+    
+    
+def deletePlant(plant):
+    plantInventory[plant] -= 1
+
+nurseryDoor = Shape(0, 350, 100, 250, goToNursery, fill='pink', shapeType='rectangle')
+orderDoor = Shape(700, 350, 100, 250, goToPotting, fill='pink', shapeType='rectangle')
+garbageCan = Shape(350, 350, 100, 100, deletePlant, fill='gray', shapeType='rectangle')
+lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action)}
 
 def onAppStart(app):
     app.width = 800
@@ -64,6 +101,14 @@ def onMousePress(app, mouseX, mouseY):
                         action()
                     else:
                         print ('f{action} is locked. Reach {requiredLevel} to unlock!')
+                        
+def onMouseRelease(app, mouseX, mouseY):
+    if store.currentRoom == lobby:
+        for plant in plantInventory:
+            if overlaps(plant, garbageCan):
+                deletePlant(plant)
+            
+                
 
 def isInSprite(mouseX, mouseY, object):
     if type(object) == Sprite:
@@ -160,6 +205,11 @@ main()
 #   immediately an icon will appear as a white circle with a black border, above the tray
 #   as the plant grows the icon will fill in like a dial
 #   growth and icon filling will occur at a speed that is proportional to the grow time of the plant
+#   after plant is fully green the icon will change to say click to add seedlings to inventory
+#   seedlings in inventory will show up in the lobby on shelves beside the door
+#   garbage can in lobby-> can drag seedlings to garbage if needed, there is limited inventory space
+#   if inventory is full, popup tells you can fill orders or delete plants
+#   
 
 
 # order fulfilment room:
