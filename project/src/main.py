@@ -1,6 +1,6 @@
 from cmu_graphics import *
 from imageProcessing import getMask
-from rooms import Store, Room, Sprite, Shape
+from rooms import Store, Room, Sprite, Shape, Item
 
 lobby = Room('lobby')
 nursery = Room('nursery')
@@ -11,6 +11,9 @@ roomSet = {lobby, nursery, order, seedShelf}
 store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 
 plantInventory = dict()
+
+pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg')
+# assign slot based on iterating lobby attribute lobby.currentSlotX, lobby.currentSlotY,
 
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
@@ -32,34 +35,41 @@ def hasCornerIn(obj, other):
     else:
         return False
 
-def overlaps(obj, other): #only works for masks and rectangles rn
-    if isinstance(obj, Shape) and isinstance(other, Shape) :
-        if hasCornerIn(obj, other)
-            return True
-        else:
-            return False
-       
-    if isinstance(obj, Sprite) and isinstance(other, Shape):
-        if hasCornerIn(obj, other)
-                objPath, threshold = spriteDict[obj]
-                for pixel in getMask(objPath, threshold):
-                    if pixel == 1
-        else:
-            return False
-    
-    if isinstance(obj, Shape) and isinstance(other, Sprite):
-       if hasCornerIn(obj, other)
-    if isinstance(obj, Sprite) and isinstance(other, Sprite):
-        
-    
+def overlaps(obj, other): #only rectangles/images being treated as rectangles
+    # if isinstance(obj, Shape) and isinstance(other, Shape) :
+    if hasCornerIn(obj, other):
+        return True
+    else:
+        return False
+    # if isinstance(obj, Sprite) and isinstance(other, Shape):
+    #     if hasCornerIn(obj, other):
+    #         objPath, threshold = spriteDict[obj]
+    #         for row in getMask(objPath, threshold):
+    #             for pixel in row:
+    #                 if pixel == 1 and # is in 
+    #     else:
+    #         return False
+    # if isinstance(obj, Shape) and isinstance(other, Sprite):
+    #    if hasCornerIn(obj, other)
+    # if isinstance(obj, Sprite) and isinstance(other, Sprite):
     
 def deletePlant(plant):
     plantInventory[plant] -= 1
 
-nurseryDoor = Shape(0, 350, 100, 250, goToNursery, fill='pink', shapeType='rectangle')
-orderDoor = Shape(700, 350, 100, 250, goToPotting, fill='pink', shapeType='rectangle')
-garbageCan = Shape(350, 350, 100, 100, deletePlant, fill='gray', shapeType='rectangle')
-lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action)}
+nurseryDoor = Shape('nurseryDoor', 0, 350, 100, 250, 'pink', 'rectangle', goToNursery)
+orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPotting)
+garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
+lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action), garbageCan: (0, garbageCan.action)}
+
+lobbyItemSet = set()
+
+def makelobbyItemSet():
+    for key in lobbyItemDict:
+        lobbyItemSet.add(key)
+    for key in plantInventory:
+        lobbyItemSet.add(key)
+
+makelobbyItemSet()
 
 def onAppStart(app):
     app.width = 800
@@ -72,11 +82,10 @@ def redrawAll(app):
     print(store.currentRoom)
     if store.currentRoom == lobby:
         drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
-        nurseryDoor.draw()
-        print()
         drawLabel('Nursery', 50, 475, size=20)
-        orderDoor.draw()
         drawLabel('Fill orders', 750, 475, size=18)
+        for item in lobbyItemDict:
+            item.draw()
     elif store.currentRoom == nursery:
         # app.background == {'color'}
         drawLabel('Nursery Placeholder', 400, 300, size=20)
@@ -101,19 +110,26 @@ def onMousePress(app, mouseX, mouseY):
                         action()
                     else:
                         print ('f{action} is locked. Reach {requiredLevel} to unlock!')
-                        
+
+def onMouseDrag(app, mouseX, mouseY, item):
+    if store.currentRoom == lobby:
+        for obj in lobbyItemSet:
+            if type(obj) == Sprite:
+                if isInSprite(mouseX, mouseY, obj):
+    if item.canDrag == True:
+        
+        
+                      
 def onMouseRelease(app, mouseX, mouseY):
     if store.currentRoom == lobby:
         for plant in plantInventory:
             if overlaps(plant, garbageCan):
                 deletePlant(plant)
-            
-                
 
-def isInSprite(mouseX, mouseY, object):
-    if type(object) == Sprite:
-        mask = getMask(object)
-        if mask[mouseX][mouseY] == 1:
+def isInSprite(mouseX, mouseY, item):
+    if type(item) == Sprite:
+        mask = getMask(item)
+        if mask[mouseX - item.x][mouseY - item.y] == 1:
             return True
         else:
             return False
@@ -209,7 +225,6 @@ main()
 #   seedlings in inventory will show up in the lobby on shelves beside the door
 #   garbage can in lobby-> can drag seedlings to garbage if needed, there is limited inventory space
 #   if inventory is full, popup tells you can fill orders or delete plants
-#   
 
 
 # order fulfilment room:

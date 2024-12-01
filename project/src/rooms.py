@@ -18,19 +18,20 @@ class Room:
     def __init__(self, name):
         self.name = name
 
-# class Object:
-#     def __init__(self, name, action=None, requiredLevel=0):
-#         self.name = name
-#         self.action = action
-#         self.requiredLevel = requiredLevel
-
-class Shape:
-    def __init__(self, x, y, width, height, action, fill=None, shapeType='rectangle'):
+class Item:
+    def __init__(self, name, x, y, width, height, action=None, requiredLevel=0, canDrag=False):
+        self.name = name
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.action = action
+        self.requiredLevel = requiredLevel
+        self.canDrag = canDrag
+
+class Shape(Item):
+    def __init__(self, name, x, y, width, height, fill=None, shapeType='rectangle', action=None, requiredLevel=0, canDrag=False):
+        super().__init__(name, x, y, width, height, action, requiredLevel, canDrag)
         self.fill = fill
         self.shapeType = shapeType
     def draw(self):
@@ -49,14 +50,9 @@ class Shape:
                 self.width / 2,
                 fill=self.fill
             )
-class Sprite:
-    def __init__(self, x, y, width, height, imagePath, action, requiredLevel):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+class Sprite(Item):
+    def __init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False):
+        super().__init__(name, x, y, width, height, action, requiredLevel, canDrag)
         self.imagePath = imagePath
-        self.action = action
-        self.requiredLevel = requiredLevel
     def draw(self):
-        drawImage(getMask(self.imagePath), self.x, self.y, width=self.width, height=self.height)
+        drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
