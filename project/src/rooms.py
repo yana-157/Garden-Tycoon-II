@@ -1,16 +1,19 @@
 from cmu_graphics import *
 
 class Store:
-    def __init__(self, playerLevel, balance):
-        self.playerLevel = 0
-        self.balance = 0
-        self.currentRoom = lobby
+    def __init__(self, currentRoom, XP=0, playerLevel=0, balance=0):
+        self.currentRoom = currentRoom
+        self.XP = XP
+        self.playerLevel = playerLevel
+        self.balance = balance
     def earn(self, payment):
         self.balance += payment
+    def earnXP(self, gainedXP):
+        self.XP += gainedXP
     def levelUp(self):
         self.playerLevel += 1
     def switchRoom(self, name):
-        if name in self.Room:
+        if name in roomSet:
             self.currentRoom = name
 
 class Room:
@@ -48,7 +51,7 @@ class Shape:
                 fill=self.fill
             )
 class Sprite:
-    def __init__(self, x, y, width, height, imagePath, action, requiredLevel, imagePath):
+    def __init__(self, x, y, width, height, imagePath, action, requiredLevel):
         self.x = x
         self.y = y
         self.width = width
@@ -56,6 +59,5 @@ class Sprite:
         self.imagePath = imagePath
         self.action = action
         self.requiredLevel = requiredLevel
-        self.imagePath = imagePath
     def draw(self):
         drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
