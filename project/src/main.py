@@ -12,8 +12,8 @@ store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 
 plantInventory = dict()
 
-pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg')
-# assign slot based on iterating lobby attribute lobby.currentSlotX, lobby.currentSlotY,
+pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', canDrag=True)
+# assign slot based on iterating lobby attribute lobby.currentSlotX, lobby.currentSlotY
 
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
@@ -61,15 +61,10 @@ orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPott
 garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
 lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action), garbageCan: (0, garbageCan.action)}
 
-lobbyItemSet = set()
-
-def makelobbyItemSet():
-    for key in lobbyItemDict:
-        lobbyItemSet.add(key)
+def addPlants():
+    slotNumber = 0
     for key in plantInventory:
-        lobbyItemSet.add(key)
-
-makelobbyItemSet()
+        
 
 def onAppStart(app):
     app.width = 800
@@ -113,7 +108,7 @@ def onMousePress(app, mouseX, mouseY):
 
 def onMouseDrag(app, mouseX, mouseY, item):
     if store.currentRoom == lobby:
-        for obj in lobbyItemSet:
+        for obj in lobbyItemDict:
             if type(obj) == Sprite:
                 if isInSprite(mouseX, mouseY, obj):
     if item.canDrag == True:
