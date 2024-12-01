@@ -12,19 +12,16 @@ class Store:
         self.XP += gainedXP
     def levelUp(self):
         self.playerLevel += 1
-    def switchRoom(self, name):
-        if name in roomSet:
-            self.currentRoom = name
 
 class Room:
     def __init__(self, name):
         self.name = name
 
-class Objects:
-    def __init__(self, name, action=None, requiredLevel=0):
-        self.name = name
-        self.action = action
-        self.requiredLevel = requiredLevel
+# class Object:
+#     def __init__(self, name, action=None, requiredLevel=0):
+#         self.name = name
+#         self.action = action
+#         self.requiredLevel = requiredLevel
 
 class Shape:
     def __init__(self, x, y, width, height, fill=None, shapeType='rectangle'):
@@ -43,7 +40,7 @@ class Shape:
                 self.height,
                 fill=self.fill
             )
-        elif self.shapeType == "circle":
+        elif self.shapeType == 'circle':
             drawCircle(
                 self.x + self.width / 2,
                 self.y + self.height / 2,
