@@ -32,8 +32,8 @@ def hasCornerIn(obj, other):
     else:
         return False
 
-def overlaps(obj, other):
-    if isinstance(obj, Shape) and isinstance(other, Shape):
+def overlaps(obj, other): #only works for masks and rectangles rn
+    if isinstance(obj, Shape) and isinstance(other, Shape) :
         if hasCornerIn(obj, other)
             return True
         else:
