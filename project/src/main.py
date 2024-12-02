@@ -8,12 +8,25 @@ seedShelf = Room('seedShelf')
 order = Room('order')
 roomSet = {lobby, nursery, order, seedShelf}
 
+customerGender = {'boy', 'girl'}
+fCustomerNames = {'Audrey', 'Rachel', 'Shrika'}
+mCustomerNames = {'Niles', 'Dahniel', 'Jacob'}
+
+# colors created/rbg values found using https://g.co/kgs/Y1UiaXs
+light = (242, 205, 184)
+medium = (207, 157, 120)
+dark = (82, 50, 33)
+customerSkinTones = {light, medium, dark}
+
 store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 
-plantInventory = dict()
+plantCounts = dict()
+
+plantInventory = []
 
 pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', canDrag=True)
-# assign slot based on iterating lobby attribute lobby.currentSlotX, lobby.currentSlotY
+
+
 
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
@@ -31,6 +44,12 @@ def hasCornerIn(obj, other):
         or obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height
         or obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height
         ):
+        return True
+    else:
+        return False
+    
+def isInRect(mouseX, mouseY, shape):
+    if shape.x <= mouseX <= shape.x + shape.width and shape.y <= mouseY <= shape.y + shape.height:
         return True
     else:
         return False
@@ -61,10 +80,9 @@ orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPott
 garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
 lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action), garbageCan: (0, garbageCan.action)}
 
-def addPlants():
-    slotNumber = 0
-    for key in plantInventory:
-        
+# def addPlants():
+#     slotNumber = 0
+#     for key in plantInventory:
 
 def onAppStart(app):
     app.width = 800
@@ -90,6 +108,8 @@ def redrawAll(app):
         drawLabel('Seed Shelf Placeholder', 400, 300, size=20)
 
 def onMousePress(app, mouseX, mouseY):
+    app.cx = mouseX
+    app.cy = mouseY
     if store.currentRoom == lobby:
         for obj in lobbyItemDict:
             reqLevel, action = lobbyItemDict[obj]
@@ -100,22 +120,33 @@ def onMousePress(app, mouseX, mouseY):
                     else:
                         print ('f{action} is locked. Reach {requiredLevel} to unlock!')
             elif type(obj) == Shape:
-                if obj.x <= mouseX <= obj.x + obj.width and obj.y <= mouseY <= obj.y + obj.height:
+                if isInRect(mouseX, mouseY, obj)
                     if app.playerLevel >= reqLevel:
                         action()
                     else:
                         print ('f{action} is locked. Reach {requiredLevel} to unlock!')
 
-def onMouseDrag(app, mouseX, mouseY, item):
+def onMouseDrag(app, mouseX, mouseY):
+    app.cx = mouseX
+    app.cy = mouseY
     if store.currentRoom == lobby:
         for obj in lobbyItemDict:
             if type(obj) == Sprite:
-                if isInSprite(mouseX, mouseY, obj):
-    if item.canDrag == True:
+                if isInSprite(app.cx, app.cy, obj):
+                    if obj.canDrag == True:
+                        obj.x += app.cx
+                        obj.y += app.cy
+            if type(obj) == Shape:
+                if isInRect(app.cx, app.cy, obj):
+                    if obj.canDrag == True:
+                        obj.x += app.cx
+                        obj.y += app.cy
         
         
                       
 def onMouseRelease(app, mouseX, mouseY):
+    app.cx = mouseX
+    app.cy = mouseY
     if store.currentRoom == lobby:
         for plant in plantInventory:
             if overlaps(plant, garbageCan):
@@ -140,13 +171,19 @@ def main():
 main()
 
 # customer approach:
-#   generate customer appearance
-#   generate customer name, which will display over the customer's head
+#   !generate customer appearance!
+#   !generate customer name!, which will display over the customer's head
 #   customer walks to the counter in a set amount of time, growing larger as it approaches
 
-# generate customer:
-#   generate a number between 1 and 2
-#   select customer gender: 1 male, 2 female
+def generateCustomer():
+    genderList = [customerGender]
+    gender = genderList[0]
+    if gender == 'boy':
+        nameList = [mCustomerNames]
+        customerName = nameList[0]
+    if gender == 'girl':
+        nameList = [fCustomerNames]
+        customerName = nameList[0]
 #   create a mask of a {gender} customer that I've colored in primary colors
 #   generate a number between 1 and 3
 #   select a skin color from the list and color in the skin this color
@@ -157,8 +194,8 @@ main()
 #   generate another number
 #   select a pants color by indexing into a list, set pants to this color
 
-# on customer arrival:
-#   when the customer arrives, !generate order!
+def onCustomerArrival():
+    order = generateOrder()
 #   !assign difficulty score! to order based on plant rarity and number of components
 #   !draw the order form!
 #   !store the order in orders list!, with the most recent order appearing first
@@ -229,7 +266,6 @@ main()
 #   plant the plant by clicking "plant" button, which plants the most recently selected plant
 #   select decoration, pot turns opaque
 #   click 'finish order" to fade back into the lobby, order ticket will be marked as resolved now
-
 
 # order scoring and pricing:
 #   amt of money earned assigned based on score

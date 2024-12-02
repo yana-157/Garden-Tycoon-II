@@ -56,3 +56,10 @@ class Sprite(Item):
         self.imagePath = imagePath
     def draw(self):
         drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
+        
+class Plant(Sprite):
+    def __init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False, inventorySlot, ):
+        super().__init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
+        self.inventorySlot = inventorySlot
+class Order
+    def __init__(self, orderSlot, )
