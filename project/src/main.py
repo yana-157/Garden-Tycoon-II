@@ -13,27 +13,26 @@ def goToPotting(app):
     switchRoom(app, app.order)
 
 def hasCornerIn(obj, other):
-    if (obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y <= obj.y + obj.height
-        or obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y <= obj.y + obj.height
-        or obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height
-        or obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height
+    if ((obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y <= obj.y + obj.height)
+        or (obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y <= obj.y + obj.height)
+        or (obj.x <= other.x <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height)
+        or (obj.x <= other.x + other.width <= obj.x + obj.width and obj.y <= other.y + other.height <= obj.y + obj.height)
         ):
         return True
     else:
         return False
     
-def isInRect(mouseX, mouseY, shape):
-    if shape.x <= mouseX <= shape.x + shape.width and shape.y <= mouseY <= shape.y + shape.height:
+def isInRect(app, mouseX, mouseY, shape):
+    app.cx = mouseX
+    app.cy = mouseY
+    if shape.x <= app.cx <= shape.x + shape.width and shape.y <= app.cy <= shape.y + shape.height:
         return True
     else:
         return False
 
 def overlaps(obj, other): #only rectangles/images being treated as rectangles
     # if isinstance(obj, Shape) and isinstance(other, Shape) :
-    if hasCornerIn(obj, other):
-        return True
-    else:
-        return False
+    return hasCornerIn(obj, other)
     # if isinstance(obj, Sprite) and isinstance(other, Shape):
     #     if hasCornerIn(obj, other):
     #         objPath, threshold = spriteDict[obj]
@@ -53,21 +52,20 @@ def createNewPlantList(app):
     app.plantList = []
     for plant in app.plantCounts:
         plantCount = app.plantCounts[plant]
-        while plantCount > 1:
+        while plantCount > 0:
             app.plantList.append(plant)
             plantCount -= 1
 
 def removeBabyPlant(app, plant):
     app.babyPlantList.remove(plant)
-    
 
 def collectPlant(app, plant):
-    if len(app.plantList) > 18:
-        app.store.popup = 'inventoryFull'
+    if len(app.plantList) >= 18:
+        app.popup = 'inventoryFull'
         return
-    app.plantCounts[plant] = app.plantCounts.get(plant, 0) + 1
-    createNewPlantList()
-    removeBabyPlant(plant)
+    app.plantCounts[plant.name] = app.plantCounts.get(plant.name, 0) + 1
+    createNewPlantList(app)
+    removeBabyPlant(app, plant)
     
 # def deleteSeedling():
     # clear the slot completely
@@ -91,10 +89,13 @@ def generateOrder(app):
 #       select the decoration corresponding to the number
 #   create order class instance containing all this info
 
-def isInSprite(mouseX, mouseY, item):
-    if type(item) == Sprite:
-        mask = getMask(item)
-        if mask[mouseX - item.x][mouseY - item.y] == 1:
+def isInSprite(app, mouseX, mouseY, item):
+    if type(item) == (Sprite or Plant):
+        mask = getMask(item, threshold = app.imageThresholdDict[item.name])
+        maskX = mouseX - item.x
+        maskY = mouseY - item.y
+        print(maskX, maskY)
+        if mask[maskY][maskX] == 1:
             return True
         else:
             return False
@@ -115,7 +116,7 @@ def onAppStart(app):
     app.store = Store(currentRoom = app.lobby, XP=0, playerLevel=0, balance=0)
     app.plantCounts = dict()
     app.plantList = []
-    app.pinkFlower = Plant('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', 1, 0, canDrag=True)
+    app.pinkFlower = Plant('pinkFlower', 300, 300, 100, 200, 'assets/simplePinkFlower.jpeg', 1, 0, canDrag=True)
     app.fiddleLeaf = Plant('fiddleLeaf', 100, 500, 30, 50, 'assets/fiddleLeaf.png', 2, 2, canDrag=True)
     app.plantDifficultyDict = {'pinkFlower': 'easy', 'fiddleLeaf': 'hard'}
     app.placeholderCustomer = Customer('customer', 300, 400, 50, 100, 'assets/customerPlaceholder.png')
@@ -125,22 +126,33 @@ def onAppStart(app):
     app.lobbyItemList = [app.nurseryDoor, app.orderDoor, app.garbageCan]
     app.lobbyItemDict = {'nurseryDoor': (0, goToNursery), 'orderDoor': (0, goToPotting), 'garbageCan': (0, deletePlant)}
     app.nurseryItemActionsDict = {'pinkFlower': (0, collectPlant)}
+    app.nameObjectDict = {'pinkFlower': app.pinkFlower,
+                          'fiddleLeaf': app.fiddleLeaf,
+                          'nurseryDoor': app.nurseryDoor,
+                          'orderDoor': app.orderDoor,
+                          'garbageCan': app.garbageCan
+                          }
     app.nonPlantNurseryItems = []
     app.babyPlantList = [app.pinkFlower]
     app.currentRoom = app.lobby
     app.popup = None
+    app.imageThresholdDict = {'pinkFlower': 215}
 
 def redrawAll(app):
     print(app.currentRoom)
     if app.popup == 'inventoryFull':
         drawRect(200, 200, 400, 200, fill='white', border='black')
         drawLabel('Inventory is full! Sell or delete a plant to make room for new plants!', 400, 300, size=20)
+    if app.popup == 'levelAlert':
+        drawLabel('This feature is locked. Reach a higher level to unlock!', 400, 300, size=20)
     if app.currentRoom == app.lobby:
         drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
         for item in app.lobbyItemList:
             item.draw()
         drawLabel('Nursery', 50, 475, size=20)
         drawLabel('Fill orders', 750, 475, size=20)
+        for plant in app.plantList:
+            plant.draw()
     elif app.currentRoom == app.nursery:
         # app.background == {'nursery image'}
         drawLabel('Nursery Placeholder', 400, 300, size=20)
@@ -160,74 +172,80 @@ def onMousePress(app, mouseX, mouseY):
         for obj in app.lobbyItemList:
             reqLevel, action = app.lobbyItemDict[obj.name]
             if type(obj) == Sprite:
-                if isInSprite(mouseX, mouseY, obj):
+                if isInSprite(app, mouseX, mouseY, obj):
                     if app.playerLevel >= reqLevel:
                         action()
                     else:
-                        print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
+                        app.popup = 'levelAlert'
             elif type(obj) == Shape:
-                if isInRect(mouseX, mouseY, obj):
+                if isInRect(app, mouseX, mouseY, obj):
                     if app.playerLevel >= reqLevel:
                         action(app)
                     else:
-                        print ('f{action} is locked. Reach {requiredLevel} to unlock!')
+                        app.popup = 'levelAlert'
     if app.currentRoom == app.nursery:
         for obj in app.nonPlantNurseryItems:
             reqLevel, action = app.nurseryItemActionsDict[obj.name]
             if type(obj) == Sprite:
-                SpriteImage = obj.imagePath
-                if isInSprite(mouseX, mouseY, SpriteImage):
+                if isInSprite(app, mouseX, mouseY, obj):
                     if app.playerLevel >= reqLevel:
                         action(app)
                     else:
-                        print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
+                        app.popup = 'levelAlert'
             elif type(obj) == Shape:
-                if isInRect(mouseX, mouseY, obj):
+                if isInRect(app, mouseX, mouseY, obj):
                     if app.playerLevel >= reqLevel:
                         action(app)
                     else:
-                        print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
-        for babyPlant in app.babyPlantList:
-            SpriteImage = babyPlant.imagePath
-            if isInSprite(mouseX, mouseY, SpriteImage):
-                    collectPlant(babyPlant)
+                        app.popup = 'levelAlert'
+        tempList = app.babyPlantList[:]
+        print(tempList)
+        for babyPlant in tempList:
+            #something to check if its within bounds, then select the correct plant object
+            print(isInSprite(app, mouseX, mouseY, babyPlant))
+            if isInSprite(app, mouseX, mouseY, babyPlant):
+                collectPlant(app, babyPlant)
+                print(mouseX, mouseY)
+                print(f'collected {babyPlant.name}')
 
 def onMouseDrag(app, mouseX, mouseY):
     app.cx = mouseX
     app.cy = mouseY
     if app.currentRoom == app.lobby:
-        for obj in app.lobbyItemDict:
+        for objName in app.lobbyItemDict:
+            obj = app.nameObjectDict[objName]
             if type(obj) == Sprite:
                 if isInSprite(app.cx, app.cy, obj):
                     if obj.canDrag == True:
-                        obj.x += app.cx
-                        obj.y += app.cy
+                        obj.x += (app.cx - mouseX)
+                        obj.y += (app.cy - mouseY)
             if type(obj) == Shape:
                 if isInRect(app.cx, app.cy, obj):
                     if obj.canDrag == True:
-                        obj.x += app.cx
-                        obj.y += app.cy
+                        obj.x += (app.cx - mouseX)
+                        obj.y += (app.cy - mouseY)
     if app.currentRoom == app.nursery:
-        for obj in app.nurseryItemActionsDict:
+        for objName in app.nurseryItemActionsDict:
+            obj = app.nameObjectDict[objName]
             if type(obj) == Sprite:
-                SpriteImage = obj.imagePath
-                if isInSprite(app.cx, app.cy, SpriteImage):
+                if isInSprite(app.cx, app.cy, obj):
                     if obj.canDrag == True:
-                        obj.x += app.cx
-                        obj.y += app.cy
+                        obj.x += (app.cx - mouseX)
+                        obj.y += (app.cy - mouseY)
             if type(obj) == Shape:
                 if isInRect(app.cx, app.cy, obj):
                     if obj.canDrag == True:
-                        obj.x += app.cx
-                        obj.y += app.cy
+                        obj.x += (app.cx - mouseX)
+                        obj.y += (app.cy - mouseY)
                       
 def onMouseRelease(app, mouseX, mouseY):
     app.cx = mouseX
     app.cy = mouseY
     if app.currentRoom == app.lobby:
-        for plant in app.plantCounts:
+        for plantName in app.plantCounts:
+            plant = app.nameObjectDict[plantName]
             if overlaps(plant, app.garbageCan):
-                deletePlant(plant)
+                deletePlant(app, plant)
     
 def onKeyPress(app, key):
     if key == 'b':
