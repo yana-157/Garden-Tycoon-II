@@ -247,8 +247,9 @@ def onMousePress(app, mouseX, mouseY):
 def onMouseDrag(app, mouseX, mouseY):
     if app.draggedObj:
         obj = app.draggedObj
-        obj.x += mouseX - app.distFromLeft # had typo of + rather than -, chatGPT found this bug: https://chatgpt.com/share/674e0ef3-3804-8001-ac34-237d87ed557f
-        obj.y += mouseY - app.distFromTop  
+        obj.x = mouseX - app.distFromLeft # had written + rather than -, chatGPT found this bug (rest of what it said was useless, just used that part and changed the sign)
+        #: https://chatgpt.com/share/674e0ef3-3804-8001-ac34-237d87ed557f
+        obj.y = mouseY - app.distFromTop  
                       
 def onMouseRelease(app, mouseX, mouseY):
     if app.currentRoom == app.lobby:
