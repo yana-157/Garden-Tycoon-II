@@ -32,7 +32,7 @@ def isInRect(app, mouseX, mouseY, shape):
 
 def overlaps(obj, other): #only rectangles/images being treated as rectangles
     # if isinstance(obj, Shape) and isinstance(other, Shape) :
-    return hasCornerIn(obj, other)
+    return (hasCornerIn(obj, other) or hasCornerIn(other, obj))
     # if isinstance(obj, Sprite) and isinstance(other, Shape):
     #     if hasCornerIn(obj, other):
     #         objPath, threshold = spriteDict[obj]
@@ -224,9 +224,9 @@ def onMousePress(app, mouseX, mouseY):
                         app.popup = 'levelAlert'
         for plant in app.plantList:
             if isInRect(app, mouseX, mouseY, plant):
+                app.draggedObj = plant
                 app.distFromTop = app.cy - plant.y
-                app.distFromLeft = app.cx - plant.x
-                app.draggedObj = plant       
+                app.distFromLeft = app.cx - plant.x       
     if app.currentRoom == app.nursery:
         for obj in app.nonPlantNurseryItems:
             reqLevel, action = app.nurseryItemActionsDict[obj.name]
@@ -255,11 +255,12 @@ def onMousePress(app, mouseX, mouseY):
                 print(f'collected {babyPlant.name}')
 
 def onMouseDrag(app, mouseX, mouseY):
-    if app.draggedObj:
-        app.draggedObj.x += mouseX - app.distFromLeft 
-        # had written + rather than -, chatGPT found this bug (rest of what it said was useless, just used that part and changed the sign)
+    if app.draggedObj and app.draggedObj.canDrag:
+        app.draggedObj.x = mouseX - app.distFromLeft 
+        # had written + rather than -, chatGPT found this bug (rest of what it said was useless, I still have not been able to fix
+        # just used that part and changed the sign)
         #: https://chatgpt.com/share/674e0ef3-3804-8001-ac34-237d87ed557f
-        app.draggedObj.y += mouseY - app.distFromTop  
+        app.draggedObj.y = mouseY - app.distFromTop
                       
 def onMouseRelease(app, mouseX, mouseY):
     if app.currentRoom == app.lobby:
@@ -269,12 +270,11 @@ def onMouseRelease(app, mouseX, mouseY):
             else:
                 app.draggedObj.x, app.draggedObj.y = app.draggedObj.properShelfPosition
     app.draggedObj = None
-                
-    
+
 def onKeyPress(app, key):
     if key == 'b':
         app.currentRoom = app.lobby
-        
+
 def onStep(app):
     app.counter += 1
 
