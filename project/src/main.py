@@ -256,11 +256,11 @@ def onMousePress(app, mouseX, mouseY):
 
 def onMouseDrag(app, mouseX, mouseY):
     if app.draggedObj and app.draggedObj.canDrag:
-        app.draggedObj.x = mouseX - app.distFromLeft 
-        # had written + rather than -, chatGPT found this bug (rest of what it said was useless, I still have not been able to fix
-        # just used that part and changed the sign)
+        app.draggedObj.x = (mouseX - app.distFromLeft)
+        # had written + rather than -, chatGPT found this bug (rest of what it said was useless, I still have not been able to fix it
+        # just used the part where it said to change the sign)
         #: https://chatgpt.com/share/674e0ef3-3804-8001-ac34-237d87ed557f
-        app.draggedObj.y = mouseY - app.distFromTop
+        app.draggedObj.y = (mouseY - app.distFromTop)
                       
 def onMouseRelease(app, mouseX, mouseY):
     if app.currentRoom == app.lobby:
