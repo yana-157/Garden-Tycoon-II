@@ -50,9 +50,12 @@ def deletePlant(app, plant):
 
 def createNewPlantList(app):
     app.plantList = []
-    for plant in app.plantCounts:
-        plantCount = app.plantCounts[plant]
+    for plantName in app.plantCounts:
+        plantCount = app.plantCounts[plantName]
         while plantCount > 0:
+            plant = app.nameObjectDict[plantName]
+            plant.width = 50
+            plant.height = 75
             app.plantList.append(plant)
             plantCount -= 1
 
@@ -137,6 +140,9 @@ def onAppStart(app):
     app.currentRoom = app.lobby
     app.popup = None
     app.imageThresholdDict = {'pinkFlower': 215}
+    app.distFromTop = None
+    app.distFromLeft = None
+    app.draggedObj = None
 
 def redrawAll(app):
     print(app.currentRoom)
@@ -154,9 +160,11 @@ def redrawAll(app):
         #logic for drawing plants in inventory in the correct slots on shelves!!
         for i in range(len(app.plantList)):
             plant = app.plantList[i]
+            plant.height = 75
+            plant.width = 50
             if (i+1)%6 < 4:
                 plant.x = 125 + 75*i
-                if i//6 == 1:
+                if i == 0 or i//6 == 1:
                     plant.y = 62.5
                 if i//6 == 2:
                     plant.y = 150
@@ -170,6 +178,7 @@ def redrawAll(app):
                     plant.y = 150
                 if i//6 == 3:
                     plant.y = 287.5
+            plant.properShelfPosition = (plant.x,plant.y)
             plant.draw()
         # make sure to draw last, after customer and everything:
         drawImage('assets/woodGrain.webp', 0, 450, width=app.width, height=150)
@@ -203,16 +212,22 @@ def onMousePress(app, mouseX, mouseY):
                         action(app)
                     else:
                         app.popup = 'levelAlert'
+        for plant in app.plantList:
+            if isInRect(app, mouseX, mouseY, plant):
+                app.distFromTop = app.cy - plant.y
+                app.distFromLeft = app.cx - plant.x
+                app.draggedObj = plant       
     if app.currentRoom == app.nursery:
         for obj in app.nonPlantNurseryItems:
             reqLevel, action = app.nurseryItemActionsDict[obj.name]
-            if type(obj) == Sprite:
-                if isInSprite(app, mouseX, mouseY, obj):
-                    if app.playerLevel >= reqLevel:
-                        action(app)
-                    else:
-                        app.popup = 'levelAlert'
-            elif type(obj) == Shape:
+            # does not work at the moment so i will debug the getMask stuff and get back to this
+            # if type(obj) == Sprite:
+            #     if isInSprite(app, mouseX, mouseY, obj):
+            #         if app.playerLevel >= reqLevel:
+            #             action(app)
+            #         else:
+            #             app.popup = 'levelAlert'
+            if type(obj) == Shape:
                 if isInRect(app, mouseX, mouseY, obj):
                     if app.playerLevel >= reqLevel:
                         action(app)
@@ -222,50 +237,28 @@ def onMousePress(app, mouseX, mouseY):
         print(tempList)
         for babyPlant in tempList:
             #something to check if its within bounds, then select the correct plant object
-            print(isInSprite(app, mouseX, mouseY, babyPlant))
-            if isInSprite(app, mouseX, mouseY, babyPlant):
+            # print(isInSprite(app, mouseX, mouseY, babyPlant))
+            # if isInSprite(app, mouseX, mouseY, babyPlant):
+            if isInRect(app, mouseX, mouseY, babyPlant):
                 collectPlant(app, babyPlant)
                 print(mouseX, mouseY)
                 print(f'collected {babyPlant.name}')
 
 def onMouseDrag(app, mouseX, mouseY):
-    app.cx = mouseX
-    app.cy = mouseY
-    if app.currentRoom == app.lobby:
-        for objName in app.lobbyItemDict:
-            obj = app.nameObjectDict[objName]
-            if type(obj) == Sprite:
-                if isInSprite(app.cx, app.cy, obj):
-                    if obj.canDrag == True:
-                        obj.x += (app.cx - mouseX)
-                        obj.y += (app.cy - mouseY)
-            if type(obj) == Shape:
-                if isInRect(app.cx, app.cy, obj):
-                    if obj.canDrag == True:
-                        obj.x += (app.cx - mouseX)
-                        obj.y += (app.cy - mouseY)
-    if app.currentRoom == app.nursery:
-        for objName in app.nurseryItemActionsDict:
-            obj = app.nameObjectDict[objName]
-            if type(obj) == Sprite:
-                if isInSprite(app.cx, app.cy, obj):
-                    if obj.canDrag == True:
-                        obj.x += (app.cx - mouseX)
-                        obj.y += (app.cy - mouseY)
-            if type(obj) == Shape:
-                if isInRect(app.cx, app.cy, obj):
-                    if obj.canDrag == True:
-                        obj.x += (app.cx - mouseX)
-                        obj.y += (app.cy - mouseY)
+    if app.draggedObj:
+        obj = app.draggedObj
+        obj.x += mouseX - app.distFromLeft # had typo of + rather than -, chatGPT found this bug: https://chatgpt.com/share/674e0ef3-3804-8001-ac34-237d87ed557f
+        obj.y += mouseY - app.distFromTop  
                       
 def onMouseRelease(app, mouseX, mouseY):
-    app.cx = mouseX
-    app.cy = mouseY
     if app.currentRoom == app.lobby:
-        for plantName in app.plantCounts:
-            plant = app.nameObjectDict[plantName]
-            if overlaps(plant, app.garbageCan):
-                deletePlant(app, plant)
+        if type(app.draggedObj) == Plant:
+            if overlaps(app.draggedObj, app.garbageCan):
+                deletePlant(app, app.draggedObj)
+            else:
+                app.draggedObj.x, app.draggedObj.y = app.draggedObj.properShelfPosition
+    app.draggedObj = None
+                
     
 def onKeyPress(app, key):
     if key == 'b':

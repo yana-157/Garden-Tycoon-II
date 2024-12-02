@@ -59,10 +59,11 @@ class Sprite(Item):
         drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
         
 class Plant(Sprite):
-    def __init__(self, name, x, y, width, height, imagePath, growTime, price=0, action=None, requiredLevel=0, canDrag=False):
+    def __init__(self, name, x, y, width, height, imagePath, growTime, properShelfPosition=(0,0), price=0, action=None, requiredLevel=0, canDrag=False):
         super().__init__(name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
         self.growTime = growTime
         self.price = price
+        properShelfPosition = properShelfPosition
 
 class Order(Item):
     def __init__(self, name, x, y, width, height, potColor, plant, soils, decoration, difficulty):
