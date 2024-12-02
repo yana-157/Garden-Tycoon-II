@@ -1,0 +1,36 @@
+from cmu_graphics import *
+from imageProcessing import getMask
+
+customerGender = {'boy', 'girl'}
+fCustomerNames = {'Audrey', 'Rachel', 'Shrika'}
+mCustomerNames = {'Niles', 'Dahniel', 'Jacob'}
+
+# colors created/rbg values found using https://g.co/kgs/Y1UiaXs
+light = rgb(242, 205, 184)
+medium = rgb(207, 157, 120)
+dark = rgb(82, 50, 33)
+customerSkinTones = {light, medium, dark}
+
+customerClothingColors = {'red', 'blue', 'brown', 'gray'}
+
+customerHairColors = {}
+
+def generateCustomer():
+    genderList = [customerGender]
+    gender = genderList[0]
+    if gender == 'boy':
+        nameList = [mCustomerNames]
+        customerName = nameList[0]
+    if gender == 'girl':
+        nameList = [fCustomerNames]
+        customerName = nameList[0]
+#   create a mask of a {gender} customer that I've colored in primary colors
+#   generate a number between 1 and 3
+#   select a skin color from the list and color in the skin this color
+#   generate another number
+#   select a hair color by indexing into a list, set hair to this color-- remove if bald
+#   generate another number
+#   select a shirt color by indexing into a list, set shirt to this color
+#   generate another number
+#   select a pants color by indexing into a list, set pants to this color
+

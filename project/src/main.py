@@ -8,16 +8,6 @@ seedShelf = Room('seedShelf')
 order = Room('order')
 roomSet = {lobby, nursery, order, seedShelf}
 
-customerGender = {'boy', 'girl'}
-fCustomerNames = {'Audrey', 'Rachel', 'Shrika'}
-mCustomerNames = {'Niles', 'Dahniel', 'Jacob'}
-
-# colors created/rbg values found using https://g.co/kgs/Y1UiaXs
-light = (242, 205, 184)
-medium = (207, 157, 120)
-dark = (82, 50, 33)
-customerSkinTones = {light, medium, dark}
-
 store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 
 plantCounts = dict()
@@ -25,8 +15,9 @@ plantCounts = dict()
 plantInventory = []
 
 pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', canDrag=True)
+fiddleLeaf = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/fiddleLeaf.png', canDrag=True)
 
-
+placeholderCustomer = 
 
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
@@ -141,8 +132,6 @@ def onMouseDrag(app, mouseX, mouseY):
                     if obj.canDrag == True:
                         obj.x += app.cx
                         obj.y += app.cy
-        
-        
                       
 def onMouseRelease(app, mouseX, mouseY):
     app.cx = mouseX
@@ -174,25 +163,6 @@ main()
 #   !generate customer appearance!
 #   !generate customer name!, which will display over the customer's head
 #   customer walks to the counter in a set amount of time, growing larger as it approaches
-
-def generateCustomer():
-    genderList = [customerGender]
-    gender = genderList[0]
-    if gender == 'boy':
-        nameList = [mCustomerNames]
-        customerName = nameList[0]
-    if gender == 'girl':
-        nameList = [fCustomerNames]
-        customerName = nameList[0]
-#   create a mask of a {gender} customer that I've colored in primary colors
-#   generate a number between 1 and 3
-#   select a skin color from the list and color in the skin this color
-#   generate another number
-#   select a hair color by indexing into a list, set hair to this color-- remove if bald
-#   generate another number
-#   select a shirt color by indexing into a list, set shirt to this color
-#   generate another number
-#   select a pants color by indexing into a list, set pants to this color
 
 def onCustomerArrival():
     order = generateOrder()
