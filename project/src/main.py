@@ -74,6 +74,7 @@ lobbyItemList = [nurseryDoor, orderDoor, garbageCan]
 lobbyItemDict = {'nurseryDoor': (0, nurseryDoor.action), 'orderDoor': (0, orderDoor.action), 'garbageCan': (0, garbageCan.action)}
 
 def createNewPlantList():
+    global plantList
     plantList = []
     for plant in plantCounts:
         plantCount = plantCounts[plant]
@@ -95,7 +96,6 @@ def collectPlant(plant):
             
 nurseryItemActionsDict = {'pinkFlower': (0, collectPlant)}
 nonPlantNurseryItems = []
-babyPlantCounts = {pinkFlower: 1}
 babyPlantList = [pinkFlower]
     
 # def deleteSeedling():
@@ -119,6 +119,14 @@ def generateOrder():
 #   generate a number between 1 and 4
 #       select the decoration corresponding to the number
 #   create order class instance containing all this info
+
+def isInSprite(mouseX, mouseY, item):
+    if type(item) == Sprite:
+        mask = getMask(item)
+        if mask[mouseX - item.x][mouseY - item.y] == 1:
+            return True
+        else:
+            return False
 
 def onAppStart(app):
     app.width = 800
@@ -189,9 +197,9 @@ def onMousePress(app, mouseX, mouseY):
                         print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
         for babyPlant in babyPlantList:
             SpriteImage = babyPlant.imagePath
+            reqLevel, action = nurseryItemActionsDict[babyPlant.name]
             if isInSprite(mouseX, mouseY, SpriteImage):
-                    if app.playerLevel >= reqLevel:
-                        action(babyPlant)
+                    action(babyPlant)
 
 def onMouseDrag(app, mouseX, mouseY):
     app.cx = mouseX
@@ -209,7 +217,7 @@ def onMouseDrag(app, mouseX, mouseY):
                         obj.x += app.cx
                         obj.y += app.cy
     if store.currentRoom == nursery:
-        for obj in nurseryItemDict:
+        for obj in nurseryItemActionsDict:
             if type(obj) == Sprite:
                 SpriteImage = obj.imagePath
                 if isInSprite(app.cx, app.cy, SpriteImage):
@@ -229,14 +237,6 @@ def onMouseRelease(app, mouseX, mouseY):
         for plant in plantCounts:
             if overlaps(plant, garbageCan):
                 deletePlant(plant)
-
-def isInSprite(mouseX, mouseY, item):
-    if type(item) == Sprite:
-        mask = getMask(item)
-        if mask[mouseX - item.x][mouseY - item.y] == 1:
-            return True
-        else:
-            return False
     
 def onKeyPress(app, key):
     if key == 'b':
