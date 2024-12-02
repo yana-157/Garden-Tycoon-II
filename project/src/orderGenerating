@@ -1,0 +1,14 @@
+from classes import Order
+
+# generate order:
+#   from a set of plants select a plant
+#   difficulty score += plantDifficultyDict[plant]
+#   generate a number between 1 and 4
+#       select that number of soils
+#   difficulty score += number/3
+#   select the required order of soils by setting that set to a list, which will automatically create a random order
+#   generate a number between 1 and 4
+#       select the pot type corresponding to the number
+#   generate a number between 1 and 4
+#       select the decoration corresponding to the number
+#   create order class instance containing all this info

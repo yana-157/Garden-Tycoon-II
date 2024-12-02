@@ -1,6 +1,6 @@
 from cmu_graphics import *
 from imageProcessing import getMask
-from rooms import Store, Room, Sprite, Shape, Item
+from classes import Store, Room, Sprite, Shape, Item
 
 lobby = Room('lobby')
 nursery = Room('nursery')
@@ -17,7 +17,7 @@ plantInventory = []
 pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', canDrag=True)
 fiddleLeaf = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/fiddleLeaf.png', canDrag=True)
 
-placeholderCustomer = 
+placeholderCustomer = Sprite('customer', 300, 400, 50, 100, 'assets/customerPlaceholder.png')
 
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
@@ -71,9 +71,8 @@ orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPott
 garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
 lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action), garbageCan: (0, garbageCan.action)}
 
-# def addPlants():
-#     slotNumber = 0
-#     for key in plantInventory:
+def addPlant():
+    plantInventory.get(plant)
 
 def onAppStart(app):
     app.width = 800
@@ -165,25 +164,11 @@ main()
 #   customer walks to the counter in a set amount of time, growing larger as it approaches
 
 def onCustomerArrival():
-    order = generateOrder()
+    placeholderCustomer.order = generateOrder()
 #   !assign difficulty score! to order based on plant rarity and number of components
 #   !draw the order form!
-#   !store the order in orders list!, with the most recent order appearing first
+#   !store the order in orders list!
 #   start timer to determine rating of order filling
-
-# generate order:
-#   difficulty score is a property of the order
-#   from a set of plants select a plant
-#   difficulty score += plantDifficultyDict[plant]
-#   generate a number between 1 and 4
-#       select that number of soils
-#   difficulty score += number/3
-#   select the required order of soils by setting that set to a list, which will automatically create a random order
-#   generate a number between 1 and 4
-#       select the pot type corresponding to the number
-#   generate a number between 1 and 4
-#       select the decoration corresponding to the number
-#   create order class instance containing all this info
 
 # draw order:
 #   draw the background of the order form

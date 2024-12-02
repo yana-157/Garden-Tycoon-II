@@ -61,5 +61,20 @@ class Plant(Sprite):
     def __init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False, inventorySlot, ):
         super().__init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
         self.inventorySlot = inventorySlot
-class Order
-    def __init__(self, orderSlot, )
+
+class Order(Item):
+    def __init__(self, name, x, y, width, height, potColor, plant, soils, decoration, difficulty):
+        super().__init__(name, x, y, width, height)
+        self.plant = plant
+        self.potColor = potColor
+        self.soils = soils
+        self.decoration = decoration
+        self.difficulty = difficulty
+    
+class Customer(Sprite):
+    def __init__(self, name, x, y, width, height, imagePath, allottedTime, action=None, requiredLevel=0, canDrag=False, order=None, emotion=happy)
+        super().__init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
+        self.order = order
+        self.allottedTime = allottedTime
+        self.emotion = emotion
+    

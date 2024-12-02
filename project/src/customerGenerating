@@ -13,7 +13,7 @@ customerSkinTones = {light, medium, dark}
 
 customerClothingColors = {'red', 'blue', 'brown', 'gray'}
 
-customerHairColors = {}
+customerHairColors = {'brown', 'red', 'yellow', 'black'}
 
 def generateCustomer():
     genderList = [customerGender]
