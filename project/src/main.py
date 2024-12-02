@@ -138,19 +138,18 @@ def onAppStart(app):
     app.nonPlantNurseryItems = []
     app.babyPlantList = [app.pinkFlower]
     app.currentRoom = app.lobby
-    app.popup = None
+    app.popup = 'inventoryFull'
     app.imageThresholdDict = {'pinkFlower': 215}
     app.distFromTop = None
     app.distFromLeft = None
     app.draggedObj = None
+    app.dismissPopup = Shape('Dismiss', 200, 200, 20, 20, 'red', 'rectangle', dismissPopup)
+
+def dismissPopup(app):
+    app.popup = None
 
 def redrawAll(app):
     print(app.currentRoom)
-    if app.popup == 'inventoryFull':
-        drawRect(200, 200, 400, 200, fill='white', border='black')
-        drawLabel('Inventory is full! Sell or delete a plant to make room for new plants!', 400, 300, size=20)
-    if app.popup == 'levelAlert':
-        drawLabel('This feature is locked. Reach a higher level to unlock!', 400, 300, size=20)
     if app.currentRoom == app.lobby:
         drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
         for item in app.lobbyItemList:
@@ -193,10 +192,21 @@ def redrawAll(app):
         drawLabel('Order Room Placeholder', 400, 300, size=20)
     elif app.currentRoom == app.seedShelf:
         drawLabel('Seed Shelf Placeholder', 400, 300, size=20)
+    if app.popup == 'inventoryFull':
+        drawRect(200, 200, 400, 200, fill='white', border='black')
+        drawLabel('Inventory is full! Sell or delete a plant', 400, 300, size=20)
+        drawLabel('to make room for new plants!', 400, 325, size=20)
+        app.dismissPopup.draw()
+    if app.popup == 'levelAlert':
+        drawRect(200, 200, 400, 200, fill='white', border='black')
+        drawLabel('This feature is locked. Reach a higher level to unlock!', 400, 300, size=20)
 
 def onMousePress(app, mouseX, mouseY):
     app.cx = mouseX
     app.cy = mouseY
+    if app.popup:
+            if isInRect(app, mouseX, mouseY, app.dismissPopup):
+                app.dismissPopup.action(app)
     if app.currentRoom == app.lobby:
         for obj in app.lobbyItemList:
             reqLevel, action = app.lobbyItemDict[obj.name]
@@ -246,10 +256,10 @@ def onMousePress(app, mouseX, mouseY):
 
 def onMouseDrag(app, mouseX, mouseY):
     if app.draggedObj:
-        obj = app.draggedObj
-        obj.x = mouseX - app.distFromLeft # had written + rather than -, chatGPT found this bug (rest of what it said was useless, just used that part and changed the sign)
+        app.draggedObj.x += mouseX - app.distFromLeft 
+        # had written + rather than -, chatGPT found this bug (rest of what it said was useless, just used that part and changed the sign)
         #: https://chatgpt.com/share/674e0ef3-3804-8001-ac34-237d87ed557f
-        obj.y = mouseY - app.distFromTop  
+        app.draggedObj.y += mouseY - app.distFromTop  
                       
 def onMouseRelease(app, mouseX, mouseY):
     if app.currentRoom == app.lobby:
