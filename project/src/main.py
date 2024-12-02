@@ -1,6 +1,6 @@
 from cmu_graphics import *
 from imageProcessing import getMask
-from classes import Store, Room, Sprite, Shape, Item
+from classes import Store, Room, Sprite, Shape, Item, Customer
 
 lobby = Room('lobby')
 nursery = Room('nursery')
@@ -11,13 +11,12 @@ roomSet = {lobby, nursery, order, seedShelf}
 store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 
 plantCounts = dict()
-
-plantInventory = []
+plantList = []
 
 pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', canDrag=True)
 fiddleLeaf = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/fiddleLeaf.png', canDrag=True)
 
-placeholderCustomer = Sprite('customer', 300, 400, 50, 100, 'assets/customerPlaceholder.png')
+placeholderCustomer = Customer('customer', 300, 400, 50, 100, 'assets/customerPlaceholder.png')
 
 def switchRoom(targetRoom):
         if targetRoom in roomSet:
@@ -64,31 +63,50 @@ def overlaps(obj, other): #only rectangles/images being treated as rectangles
     # if isinstance(obj, Sprite) and isinstance(other, Sprite):
     
 def deletePlant(plant):
-    plantInventory[plant] -= 1
+    plantCounts[plant] -= 1
 
 nurseryDoor = Shape('nurseryDoor', 0, 350, 100, 250, 'pink', 'rectangle', goToNursery)
 orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPotting)
 garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
 lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action), garbageCan: (0, garbageCan.action)}
 
-def addPlant():
-    plantInventory.get(plant)
+def collectPlant(plant):
+    if len(plantList) > 18:
+        store.popup = 'inventoryFull'
+        return
+    plantCounts[plant] = plantCounts.get(plant, 0) + 1
+    for plant in plantCounts:
+        plantCount = plantCounts[plant]
+        while plantCount > 1:
+            plantList = []
+            plantCount = plantCounts[plant]
+            plantList.append(plant)
+            
+nurseryItemDict = {pinkFlower: (collectPlant(pinkFlower), 0)}
+    
+# def deleteSeedling():
+    # clear the slot completely
 
 def onAppStart(app):
     app.width = 800
     app.height = 600
     app.playerLevel = 0
     app.backgroundPic = 'assets/shopPlaceholder.jpeg'
+    app.stepsPerSecond = 5
     store.currentRoom = lobby
+    plantCounts = {pinkFlower: 1}
 
 def redrawAll(app):
     print(store.currentRoom)
+    if store.popup == 'inventoryFull':
+        drawRect(200, 200, 400, 200, fill='white', border='black')
+        drawLabel('Inventory is full! Sell or delete a plant to make room for new plants!', 400, 300, size=20)
     if store.currentRoom == lobby:
         drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
-        drawLabel('Nursery', 50, 475, size=20)
-        drawLabel('Fill orders', 750, 475, size=18)
         for item in lobbyItemDict:
             item.draw()
+        drawLabel('Nursery', 50, 475, size=20)
+        drawLabel('Fill orders', 750, 475, size=20)
     elif store.currentRoom == nursery:
         # app.background == {'color'}
         drawLabel('Nursery Placeholder', 400, 300, size=20)
@@ -108,9 +126,24 @@ def onMousePress(app, mouseX, mouseY):
                     if app.playerLevel >= reqLevel:
                         action()
                     else:
-                        print ('f{action} is locked. Reach {requiredLevel} to unlock!')
+                        print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
             elif type(obj) == Shape:
-                if isInRect(mouseX, mouseY, obj)
+                if isInRect(mouseX, mouseY, obj):
+                    if app.playerLevel >= reqLevel:
+                        action()
+                    else:
+                        print ('f{action} is locked. Reach {requiredLevel} to unlock!')
+    if store.currentRoom == nursery:
+        for obj in nurseryItemDict:
+            reqLevel, action = lobbyItemDict[obj]
+            if type(obj) == Sprite:
+                if isInSprite(mouseX, mouseY, obj):
+                    if app.playerLevel >= reqLevel:
+                        action()
+                    else:
+                        print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
+            elif type(obj) == Shape:
+                if isInRect(mouseX, mouseY, obj):
                     if app.playerLevel >= reqLevel:
                         action()
                     else:
@@ -136,7 +169,7 @@ def onMouseRelease(app, mouseX, mouseY):
     app.cx = mouseX
     app.cy = mouseY
     if store.currentRoom == lobby:
-        for plant in plantInventory:
+        for plant in plantCounts:
             if overlaps(plant, garbageCan):
                 deletePlant(plant)
 
@@ -152,6 +185,9 @@ def isInSprite(mouseX, mouseY, item):
 def onKeyPress(app, key):
     if key == 'b':
         store.currentRoom = lobby
+        
+def onStep(app):
+    app.counter += 1
 
 def main():
     runApp()
@@ -161,7 +197,7 @@ main()
 # customer approach:
 #   !generate customer appearance!
 #   !generate customer name!, which will display over the customer's head
-#   customer walks to the counter in a set amount of time, growing larger as it approaches
+#   customer walks to the counter in a set amount of time, growing larger and moving slightly downwards as they approach
 
 def onCustomerArrival():
     placeholderCustomer.order = generateOrder()
@@ -180,7 +216,7 @@ def onCustomerArrival():
 # random number selector(number):
 #   generate a number from 0-number
 
-# customer emotions:
+# def customerEmotions(Customer, )
 #   starts out happy
 #   as the timer runs out for the order, the customer grows more upset
 #   if half of the time has elapsed:

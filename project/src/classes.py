@@ -2,11 +2,12 @@ from cmu_graphics import *
 from imageProcessing import getMask
 
 class Store:
-    def __init__(self, currentRoom, XP=0, playerLevel=0, balance=0):
+    def __init__(self, currentRoom, XP=0, playerLevel=0, balance=0, popup = None):
         self.currentRoom = currentRoom
         self.XP = XP
         self.playerLevel = playerLevel
         self.balance = balance
+        self.popup = popup
     def earn(self, payment):
         self.balance += payment
     def earnXP(self, gainedXP):
@@ -52,15 +53,16 @@ class Shape(Item):
             )
 class Sprite(Item):
     def __init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False):
-        super().__init__(name, x, y, width, height, action, requiredLevel, canDrag)
+        super().__init__(name, x, y, width, height, action, requiredLevel, canDrag=False)
         self.imagePath = imagePath
     def draw(self):
         drawImage(self.imagePath, self.x, self.y, width=self.width, height=self.height)
         
 class Plant(Sprite):
-    def __init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False, inventorySlot, ):
+    def __init__(self, name, x, y, width, height, imagePath, growTime, price=0, action=None, requiredLevel=0, canDrag=False):
         super().__init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
-        self.inventorySlot = inventorySlot
+        self.growTime = growTime
+        self.price = price
 
 class Order(Item):
     def __init__(self, name, x, y, width, height, potColor, plant, soils, decoration, difficulty):
@@ -70,10 +72,10 @@ class Order(Item):
         self.soils = soils
         self.decoration = decoration
         self.difficulty = difficulty
-    
+
 class Customer(Sprite):
-    def __init__(self, name, x, y, width, height, imagePath, allottedTime, action=None, requiredLevel=0, canDrag=False, order=None, emotion=happy)
-        super().__init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
+    def __init__(self, name, x, y, width, height, imagePath, allottedTime=10, canDrag=False, order=None, emotion='happy'):
+        super().__init__(self, name, x, y, width, height, imagePath, canDrag=False)
         self.order = order
         self.allottedTime = allottedTime
         self.emotion = emotion
