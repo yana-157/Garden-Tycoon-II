@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import sys
 
-# source: https://python-forum.io/thread-14617.html
+# source: https://python-forum.io/thread-14617.html, wall and gradd found here as well
  
 pygame.init()
  
