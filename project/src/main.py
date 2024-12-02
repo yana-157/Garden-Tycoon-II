@@ -1,6 +1,6 @@
 from cmu_graphics import *
 from imageProcessing import getMask
-from classes import Store, Room, Sprite, Shape, Item, Customer
+from classes import Store, Room, Sprite, Shape, Customer, Plant
 
 lobby = Room('lobby')
 nursery = Room('nursery')
@@ -13,8 +13,10 @@ store = Store(currentRoom = lobby, XP=0, playerLevel=0, balance=0)
 plantCounts = dict()
 plantList = []
 
-pinkFlower = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', canDrag=True)
-fiddleLeaf = Sprite('pinkFlower', 100, 500, 30, 50, 'assets/fiddleLeaf.png', canDrag=True)
+pinkFlower = Plant('pinkFlower', 100, 500, 30, 50, 'assets/simplePinkFlower.jpeg', 1, 0, canDrag=True)
+fiddleLeaf = Plant('pinkFlower', 100, 500, 30, 50, 'assets/fiddleLeaf.png', 2, 2, canDrag=True)
+
+plantDifficultyDict = {pinkFlower: 'easy', fiddleLeaf: 'hard'}
 
 placeholderCustomer = Customer('customer', 300, 400, 50, 100, 'assets/customerPlaceholder.png')
 
@@ -70,22 +72,45 @@ orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPott
 garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
 lobbyItemDict = {nurseryDoor: (0, nurseryDoor.action), orderDoor: (0, orderDoor.action), garbageCan: (0, garbageCan.action)}
 
-def collectPlant(plant):
-    if len(plantList) > 18:
-        store.popup = 'inventoryFull'
-        return
-    plantCounts[plant] = plantCounts.get(plant, 0) + 1
+def createNewPlantList():
     for plant in plantCounts:
         plantCount = plantCounts[plant]
         while plantCount > 1:
             plantList = []
             plantCount = plantCounts[plant]
             plantList.append(plant)
+
+def collectPlant(plant):
+    if len(plantList) > 18:
+        store.popup = 'inventoryFull'
+        return
+    plantCounts[plant] = plantCounts.get(plant, 0) + 1
+    createNewPlantList()
             
 nurseryItemDict = {pinkFlower: (collectPlant(pinkFlower), 0)}
+babyPlantCounts = {pinkFlower: 1}
     
 # def deleteSeedling():
     # clear the slot completely
+
+def generateOrder():
+    tempList = [plantSet]
+    difficultyScore = 0
+    plant = tempList[0]
+#   from a set of plants select a plant
+    if plantDifficultyDict[plant] == 'easy':
+        difficultyScore += 10
+    if plantDifficultyDict[plant] == 'hard':
+        difficultyScore += 20
+#   generate a number between 1 and 4
+#       select that number of soils
+#   difficulty score += number/3
+#   select the required order of soils by setting that set to a list, which will automatically create a random order
+#   generate a number between 1 and 4
+#       select the pot type corresponding to the number
+#   generate a number between 1 and 4
+#       select the decoration corresponding to the number
+#   create order class instance containing all this info
 
 def onAppStart(app):
     app.width = 800
@@ -93,8 +118,9 @@ def onAppStart(app):
     app.playerLevel = 0
     app.backgroundPic = 'assets/shopPlaceholder.jpeg'
     app.stepsPerSecond = 5
+    app.counter = 0
+    app.activeOrder = False
     store.currentRoom = lobby
-    plantCounts = {pinkFlower: 1}
 
 def redrawAll(app):
     print(store.currentRoom)
@@ -108,8 +134,10 @@ def redrawAll(app):
         drawLabel('Nursery', 50, 475, size=20)
         drawLabel('Fill orders', 750, 475, size=20)
     elif store.currentRoom == nursery:
-        # app.background == {'color'}
+        # app.background == {'nursery image'}
         drawLabel('Nursery Placeholder', 400, 300, size=20)
+        for item in nurseryItemDict:
+            item.draw()
     elif store.currentRoom == order:
         drawLabel('Order Room Placeholder', 400, 300, size=20)
     elif store.currentRoom == seedShelf:
@@ -135,9 +163,10 @@ def onMousePress(app, mouseX, mouseY):
                         print ('f{action} is locked. Reach {requiredLevel} to unlock!')
     if store.currentRoom == nursery:
         for obj in nurseryItemDict:
-            reqLevel, action = lobbyItemDict[obj]
+            reqLevel, action = nurseryItemDict[obj]
             if type(obj) == Sprite:
-                if isInSprite(mouseX, mouseY, obj):
+                SpriteImage = obj.imagePath
+                if isInSprite(mouseX, mouseY, SpriteImage):
                     if app.playerLevel >= reqLevel:
                         action()
                     else:
@@ -147,7 +176,7 @@ def onMousePress(app, mouseX, mouseY):
                     if app.playerLevel >= reqLevel:
                         action()
                     else:
-                        print ('f{action} is locked. Reach {requiredLevel} to unlock!')
+                        print (f'This feature is locked. Reach {obj.requiredLevel} to unlock!')
 
 def onMouseDrag(app, mouseX, mouseY):
     app.cx = mouseX
@@ -156,6 +185,19 @@ def onMouseDrag(app, mouseX, mouseY):
         for obj in lobbyItemDict:
             if type(obj) == Sprite:
                 if isInSprite(app.cx, app.cy, obj):
+                    if obj.canDrag == True:
+                        obj.x += app.cx
+                        obj.y += app.cy
+            if type(obj) == Shape:
+                if isInRect(app.cx, app.cy, obj):
+                    if obj.canDrag == True:
+                        obj.x += app.cx
+                        obj.y += app.cy
+    if store.currentRoom == nursery:
+        for obj in nurseryItemDict:
+            if type(obj) == Sprite:
+                SpriteImage = obj.imagePath
+                if isInSprite(app.cx, app.cy, SpriteImage):
                     if obj.canDrag == True:
                         obj.x += app.cx
                         obj.y += app.cy
@@ -180,7 +222,6 @@ def isInSprite(mouseX, mouseY, item):
             return True
         else:
             return False
-        
     
 def onKeyPress(app, key):
     if key == 'b':
@@ -201,9 +242,8 @@ main()
 
 def onCustomerArrival():
     placeholderCustomer.order = generateOrder()
-#   !assign difficulty score! to order based on plant rarity and number of components
-#   !draw the order form!
-#   !store the order in orders list!
+    app.activeOrder = True
+#   when you click collect order: !store the order in orders list!
 #   start timer to determine rating of order filling
 
 # draw order:

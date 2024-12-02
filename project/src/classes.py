@@ -60,7 +60,7 @@ class Sprite(Item):
         
 class Plant(Sprite):
     def __init__(self, name, x, y, width, height, imagePath, growTime, price=0, action=None, requiredLevel=0, canDrag=False):
-        super().__init__(self, name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
+        super().__init__(name, x, y, width, height, imagePath, action=None, requiredLevel=0, canDrag=False)
         self.growTime = growTime
         self.price = price
 
@@ -75,7 +75,7 @@ class Order(Item):
 
 class Customer(Sprite):
     def __init__(self, name, x, y, width, height, imagePath, allottedTime=10, canDrag=False, order=None, emotion='happy'):
-        super().__init__(self, name, x, y, width, height, imagePath, canDrag=False)
+        super().__init__(name, x, y, width, height, imagePath, canDrag=False)
         self.order = order
         self.allottedTime = allottedTime
         self.emotion = emotion
