@@ -104,7 +104,7 @@ def onAppStart(app):
     app.width = 800
     app.height = 600
     app.playerLevel = 0
-    app.backgroundPic = 'assets/shopPlaceholder.jpeg'
+    app.backgroundPic = 'assets/lobbySketch.png'
     app.stepsPerSecond = 5
     app.counter = 0
     app.activeOrder = False
@@ -120,9 +120,9 @@ def onAppStart(app):
     app.fiddleLeaf = Plant('fiddleLeaf', 100, 500, 30, 50, 'assets/fiddleLeaf.png', 2, 2, canDrag=True)
     app.plantDifficultyDict = {'pinkFlower': 'easy', 'fiddleLeaf': 'hard'}
     app.placeholderCustomer = Customer('customer', 300, 400, 50, 100, 'assets/customerPlaceholder.png')
-    app.nurseryDoor = Shape('nurseryDoor', 0, 350, 100, 250, 'pink', 'rectangle', goToNursery)
-    app.orderDoor = Shape('orderDoor', 700, 350, 100, 250, 'pink', 'rectangle', goToPotting)
-    app.garbageCan = Shape('garbageCan', 350, 350, 100, 100, 'gray', 'rectangle', deletePlant)
+    app.nurseryDoor = Shape('nurseryDoor', 0, 250, 100, 250, 'pink', 'rectangle', goToNursery)
+    app.orderDoor = Shape('orderDoor', 700, 250, 100, 250, 'pink', 'rectangle', goToPotting)
+    app.garbageCan = Shape('garbageCan', 525, 350, 75, 100, 'gray', 'rectangle', deletePlant)
     app.lobbyItemList = [app.nurseryDoor, app.orderDoor, app.garbageCan]
     app.lobbyItemDict = {'nurseryDoor': (0, goToNursery), 'orderDoor': (0, goToPotting), 'garbageCan': (0, deletePlant)}
     app.nurseryItemActionsDict = {'pinkFlower': (0, collectPlant)}
@@ -149,10 +149,30 @@ def redrawAll(app):
         drawImage(app.backgroundPic, 0, 0, width=app.width, height=app.height)
         for item in app.lobbyItemList:
             item.draw()
-        drawLabel('Nursery', 50, 475, size=20)
-        drawLabel('Fill orders', 750, 475, size=20)
-        for plant in app.plantList:
+        drawLabel('Nursery', 50, 375, size=20)
+        drawLabel('Fill orders', 750, 375, size=20)
+        #logic for drawing plants in inventory in the correct slots on shelves!!
+        for i in range(len(app.plantList)):
+            plant = app.plantList[i]
+            if (i+1)%6 < 4:
+                plant.x = 125 + 75*i
+                if i//6 == 1:
+                    plant.y = 62.5
+                if i//6 == 2:
+                    plant.y = 150
+                if i//6 == 3:
+                    plant.y = 287.5
+            else:
+                plant.x = 475 + 75*(i-3)
+                if i//6 == 1:
+                    plant.y = 62.5
+                if i//6 == 2:
+                    plant.y = 150
+                if i//6 == 3:
+                    plant.y = 287.5
             plant.draw()
+        # make sure to draw last, after customer and everything:
+        drawImage('assets/woodGrain.webp', 0, 450, width=app.width, height=150)
     elif app.currentRoom == app.nursery:
         # app.background == {'nursery image'}
         drawLabel('Nursery Placeholder', 400, 300, size=20)
